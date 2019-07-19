@@ -1,13 +1,13 @@
 import { Cookie, canonicalDomain, parseDate, CookieJar } from "tough-cookie";
 import * as fs from "fs";
 import { APIBaseURL } from "../Define";
-import * as request from "request";
+import { String as TSO } from "typescript-string-operations";
 
-export class CookieParser {
+export class CookieService {
     public static Parse(cookieFile: string): Array<Cookie> {
         let cookies = new Array<Cookie>();
         let cookieData = fs.readFileSync(cookieFile).toString("utf-8").split(/\r\n|\n/);
-        cookieData.forEach(function (line) {
+        cookieData.forEach(line => {
             if (/^\s*$/.test(line) || line.startsWith("#")) {
                 return;
             }
@@ -15,9 +15,9 @@ export class CookieParser {
             if (split.length < 7) {
                 return;
             }
-            var domain = split[0];
-            var expiryInt = parseInt(split[4]);
-            var cookie = new Cookie({
+            let domain = split[0];
+            let expiryInt = parseInt(split[4]);
+            let cookie = new Cookie({
                 domain: canonicalDomain(domain),
                 path: split[2],
                 secure: split[3].toLowerCase() == "true",
@@ -32,22 +32,16 @@ export class CookieParser {
         return cookies;
     }
 
-    public static NewCookieJar(file: string): CookieJar {
-        let cookies = CookieParser.Parse(file);
+    public static BuildCookieJar(file: string): CookieJar {
+        let cookies = CookieService.Parse(file);
         let jar = new CookieJar();
         for (const ck of cookies) {
             jar.setCookieSync(ck, APIBaseURL);
         }
-        console.log(jar.getCookieStringSync(APIBaseURL));
         return jar;
     }
 
-    public static RequestCookieJar(file: string): request.CookieJar {
-        let cookies = CookieParser.Parse(file);
-        let jar = request.jar();
-        for (const ck of cookies) {
-            jar.setCookie(ck, APIBaseURL);
-        }
-        return jar;
+    public static BuildCookieHeader(cookies: Cookie[]): string {
+        return TSO.Join("; ", cookies.map(ck => `${ck.key}=${ck.value}`));
     }
 }

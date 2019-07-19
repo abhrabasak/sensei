@@ -1,5 +1,5 @@
 import { JsonObject, JsonProperty } from "json2typescript";
-import { CourseResponse } from "./Course";
+import { CourseResponse } from "./course-response";
 
 @JsonObject("MembershipElement")
 class MembershipElement {

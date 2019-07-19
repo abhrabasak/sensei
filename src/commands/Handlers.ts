@@ -1,38 +1,43 @@
-import { DownloadAction } from "./Sensei";
+import { DownloadAction } from "./download-action";
 import chalk from "chalk";
-import { Session } from "../session/Session";
-import { SpecializationResponse } from "../views/specialization";
+import { Session } from "../session/session";
+import { SpecializationResponse } from "../views/specialization-response";
 import { String as Tso } from "typescript-string-operations";
-import { SpecializationURL } from "../Define";
-import { Specialization } from "../models/Specialization";
-import { Extractor } from "../coursera/Extractor";
+import { SpecializationURL, CookieFile } from "../Define";
+import { Specialization } from "../models/specialization";
+import { Extractor } from "../coursera/extractor";
+import { Result } from "@usefultools/monads";
 
-export async function HandleSpecialization(args: DownloadAction) {
-    console.log(chalk.cyan(`Specialization: ${args.classNames.values}`));
-    const cookieFile = "C:/Coursera/cookies.txt";
+export async function DownloadSpecialization(args: DownloadAction) {
+    console.log(chalk.cyan(`Specialization: ${args.ClassNames.values}`));
+    const cookieFile = CookieFile;
     let session = new Session(cookieFile);
-    let sp = await GetSpecialization(session, args.classNames.values[0]);
-    console.log(chalk.cyan(`Name: ${sp.Name}`));
-    for (let c of sp.Courses) {
-        console.log(chalk.green(`Course Name: ${c.Name}`));
-        DownloadOnDemandClass(session, c.Symbol, args);
-    }
+    let result = await GetSpecialization(session, args.ClassNames.values[0]);
+    return result.map(sp => {
+        console.log(chalk.cyan(`Name: ${sp.Name}`));
+        for (let c of sp.Courses) {
+            console.log(chalk.green(`Course Name: ${c.Name}`));
+            DownloadOnDemandClass(session, c.Symbol, args);
+        }
+    });
 }
 
-async function GetSpecialization(session: Session, name: string): Promise<Specialization> {
+async function GetSpecialization(session: Session, name: string): Promise<Result<Specialization, string>> {
     let url = Tso.Format(SpecializationURL, name);
-    let sr = await session.GetJson(url, SpecializationResponse);
-    let courses = sr.Linked.Courses.map(cr => cr.ToModel());
-    return {
-        Name: sr.Elements[0].Name,
-        Courses: courses
-    };
+    let result = await session.GetJson(url, SpecializationResponse);
+    return result.map(sr => {
+        let courses = sr.Linked.Courses.map(cr => cr.ToModel());
+        return {
+            Name: sr.Elements[0].Name,
+            Courses: courses
+        };
+    });
 }
 
-export function HandleCourses(args: DownloadAction) {
-    let courseNames = args.classNames.values;
+export function DownloadCourses(args: DownloadAction) {
+    let courseNames = args.ClassNames.values;
     console.log(chalk.cyan(`Class Names: ${courseNames}`));
-    const cookieFile = "C:/Coursera/cookies.txt";
+    const cookieFile = CookieFile;
     let session = new Session(cookieFile);
     for (const c of courseNames) {
         DownloadOnDemandClass(session, c, args);
@@ -40,13 +45,14 @@ export function HandleCourses(args: DownloadAction) {
 }
 
 export async function ListCourses(args: DownloadAction) {
-    const cookieFile = "C:/Coursera/cookies.txt";
+    const cookieFile = CookieFile;
     let session = new Session(cookieFile);
     let extractor = new Extractor(session, args);
-    let courses = await extractor.ListCourses();
-    for (const c of courses) {
-        console.log(c);
-    }
+    let result = await extractor.ListCourses();
+    result.match({
+        err: _ => { },
+        ok: courses => { courses.forEach(c => console.log(c)); }
+    });
 }
 
 function DownloadOnDemandClass(session: Session, className: string, args: DownloadAction) {

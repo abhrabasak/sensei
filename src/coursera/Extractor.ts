@@ -1,7 +1,8 @@
-import { Session } from "../session/Session";
-import { DownloadAction } from "../commands/Sensei";
-import { CourseResponse } from "../views/Course";
-import { OnDemand } from "./OnDemand";
+import { Session } from "../session/session";
+import { DownloadAction } from "../commands/download-action";
+import { CourseResponse } from "../views/course-response";
+import { OnDemand } from "./on-demand";
+import { Result } from "@usefultools/monads";
 
 export class Extractor {
     session: Session;
@@ -12,7 +13,7 @@ export class Extractor {
         this.args = args;
     }
 
-    public async ListCourses(): Promise<CourseResponse[]> {
+    public async ListCourses(): Promise<Result<CourseResponse[], string>> {
         let onDemand = new OnDemand(this.session, "", this.args);
         return await onDemand.ListCourses();
     }
