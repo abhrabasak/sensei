@@ -1,12 +1,14 @@
-import { CommandLineChoiceParameter, CommandLineStringListParameter, CommandLineAction } from "@microsoft/ts-command-line";
+import { CommandLineChoiceParameter, CommandLineStringListParameter, CommandLineAction, CommandLineFlagParameter, CommandLineIntegerParameter } from "@microsoft/ts-command-line";
 import { DownloadSpecialization, DownloadCourses, ListCourses } from "./handlers";
 
 export class DownloadAction extends CommandLineAction {
     // Basic
     public ClassType: CommandLineChoiceParameter;
     public ClassNames: CommandLineStringListParameter;
+    public Jobs: CommandLineIntegerParameter;
     //Downloaders
     public Downloader: CommandLineChoiceParameter;
+    public Resume: CommandLineFlagParameter;
 
     public constructor() {
         super({
@@ -30,11 +32,20 @@ export class DownloadAction extends CommandLineAction {
             description: "Class Names",
             argumentName: "CLASSNAMES"
         });
+        this.Jobs = this.defineIntegerParameter({
+            parameterLongName: "--jobs",
+            description: "Number of Jobs",
+            argumentName: "JOBS"
+        })
         this.Downloader = this.defineChoiceParameter({
             parameterLongName: "--downloader",
             description: "Choice of downloader",
             alternatives: ["curl", "wget", "aria", "aria2", "axel"],
             defaultValue: "curl"
+        });
+        this.Resume = this.defineFlagParameter({
+            parameterLongName: "--resume",
+            description: "Is Resume Enabled"
         });
     }
 

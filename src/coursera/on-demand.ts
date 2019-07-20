@@ -16,7 +16,7 @@ export class OnDemand {
         this.classID = classID;
     }
 
-    public async ListCourses(): Promise<Result<CourseResponse[], string>> {
+    public async ListCourses(): Promise<Result<CourseResponse[], Error>> {
         let result = await this.session.GetJson(MembershipsURL, MembershipsResponse);
         return result.map(memberships => memberships.Linked.Courses);
     }

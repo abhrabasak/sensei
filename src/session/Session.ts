@@ -21,14 +21,14 @@ export class Session {
         this.json = new JsonConvert();
     }
 
-    public async GetJson<T>(url: string, type: new () => T): Promise<Result<T, string>> {
+    public async GetJson<T>(url: string, type: new () => T): Promise<Result<T, Error>> {
         let response = this.client.get(url);
-        let result: Result<T, string> = await response.then((ar) => {
+        let result: Result<T, Error> = await response.then((ar) => {
             if (ar.status == 200) {
                 let resJson: T = this.json.deserializeObject(ar.data, type);
                 return Ok(resJson);
             } else {
-                return Err("Request Failed");
+                return Err(new Error("Request Failed"));
             }
         });
         return result;

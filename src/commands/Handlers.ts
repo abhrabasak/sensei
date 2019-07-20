@@ -22,7 +22,7 @@ export async function DownloadSpecialization(args: DownloadAction) {
     });
 }
 
-async function GetSpecialization(session: Session, name: string): Promise<Result<Specialization, string>> {
+async function GetSpecialization(session: Session, name: string): Promise<Result<Specialization, Error>> {
     let url = Tso.Format(SpecializationURL, name);
     let result = await session.GetJson(url, SpecializationResponse);
     return result.map(sr => {
