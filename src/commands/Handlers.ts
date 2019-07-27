@@ -2,11 +2,14 @@ import { DownloadAction } from "./download-action";
 import chalk from "chalk";
 import { Session } from "../session/session";
 import { SpecializationResponse } from "../views/specialization-response";
-import { String as Tso } from "typescript-string-operations";
-import { SpecializationURL, CookieFile } from "../Define";
-import { Specialization } from "../models/specialization";
+import { SpecializationURL, CookieFile } from "../define";
+import { Specialization, Course } from "../models";
 import { Extractor } from "../coursera/extractor";
-import { Result } from "@usefultools/monads";
+import { Result, Ok, Err } from "@usefultools/monads";
+import { join } from "path";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import { JsonConvert } from "json2typescript";
+import { format } from "util";
 
 export async function DownloadSpecialization(args: DownloadAction) {
     console.log(chalk.cyan(`Specialization: ${args.ClassNames.values}`));
@@ -23,7 +26,7 @@ export async function DownloadSpecialization(args: DownloadAction) {
 }
 
 async function GetSpecialization(session: Session, name: string): Promise<Result<Specialization, Error>> {
-    let url = Tso.Format(SpecializationURL, name);
+    let url = format(SpecializationURL, name);
     let result = await session.GetJson(url, SpecializationResponse);
     return result.map(sr => {
         let courses = sr.Linked.Courses.map(cr => cr.ToModel());
@@ -55,6 +58,36 @@ export async function ListCourses(args: DownloadAction) {
     });
 }
 
-function DownloadOnDemandClass(session: Session, className: string, args: DownloadAction) {
-    console.log(className);
+async function DownloadOnDemandClass(session: Session, className: string, args: DownloadAction): Promise<Result<boolean, Error>> {
+    let course: Course;
+    const j = new JsonConvert();
+    // Check if syllabus is cached - if yes, use it
+    const syllabusFile = join(args.Path.value, `${className}-syllabus.json`);
+    if (args.CacheSyllabus.value) {
+        const syllabusExists = existsSync(syllabusFile);
+        if (syllabusExists) {
+            const syllabus = readFileSync(syllabusFile);
+            course = j.deserializeObject(syllabus, Course);
+        }
+    }
+    // If no cached syllabus is found, generate the syllabus
+    if (course == null) {
+        const ce = new Extractor(session, args);
+        const result = await ce.ExtractCourse(className);
+        if (result.is_err()) {
+            return Err(result.unwrap_err());
+        }
+        course = result.unwrap();
+    }
+    // Check if syllabus should be cached - if yes, save it
+    if (args.CacheSyllabus.value) {
+        const jsyl = JSON.stringify(j.serializeObject(course), null, 2);
+        writeFileSync(syllabusFile, jsyl);
+    }
+    if (args.OnlySyllabus.value) {
+        return Ok(true);
+    }
+    // const ts = CreateScheduler(session, args);
+    // const workflow = 
+    return Ok(true);
 }

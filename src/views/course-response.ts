@@ -1,5 +1,5 @@
 import { JsonObject, JsonProperty } from "json2typescript";
-import { Course } from "../models/course";
+import { Course } from "../models";
 
 @JsonObject("CourseResponse")
 export class CourseResponse {

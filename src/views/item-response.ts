@@ -1,5 +1,5 @@
 import { JsonObject, JsonProperty } from "json2typescript";
-import { Item } from "../models/item";
+import { Item } from "../models";
 
 @JsonObject("ItemContentSummary")
 class ItemContentSummary {
@@ -25,10 +25,10 @@ class ItemLockSummary {
 export class ItemResponse {
     @JsonProperty("contentSummary", ItemContentSummary)
     ContentSummary: ItemContentSummary = undefined;
-    @JsonProperty("itemLockSummary", ItemLockSummary)
+    @JsonProperty("itemLockSummary", ItemLockSummary, true)
     ItemLockSummary: ItemLockSummary = undefined;
     @JsonProperty("id", String)
-    ID: string
+    ID: string = undefined;
     @JsonProperty("isLocked", Boolean)
     IsLocked: boolean = undefined;
     @JsonProperty("lessonId", String)

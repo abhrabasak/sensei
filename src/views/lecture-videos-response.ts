@@ -13,9 +13,9 @@ export class VideoDownload {
 
 @JsonObject("VideoSourcePlaylist")
 class VideoSourcePlaylist {
-    @JsonProperty("hls", String)
+    @JsonProperty("hls", String, true)
     Hls: string = undefined;
-    @JsonProperty("mpeg-dash", String)
+    @JsonProperty("mpeg-dash", String, true)
     MpegDash: string = undefined;
 }
 

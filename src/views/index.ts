@@ -5,6 +5,6 @@ export { CourseResponse } from "./course-response";
 export { CourseMaterialsResponse } from "./course-materials-response";
 export { SectionResponse } from "./section-response";
 export { ItemResponse } from "./item-response";
-export { LectureVideosResponse } from "./lecture-videos-response";
+export { LectureVideosResponse, Video } from "./lecture-videos-response";
 export { LectureAssetsResponse } from "./assets-response";
 export { OpenCourseAssetsResponse } from "./open-course-assets-response";

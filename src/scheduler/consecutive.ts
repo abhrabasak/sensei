@@ -1,5 +1,5 @@
 import { DownloadTask } from "./download-task";
-import { IDownloader } from "../downloader/external";
+import { IDownloader } from "../downloader";
 import { DownloadAction } from "../commands/download-action";
 import { Scheduler } from "./scheduler";
 

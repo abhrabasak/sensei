@@ -2,7 +2,7 @@ import { Session } from "../session/session";
 import { DownloadAction } from "../commands/download-action";
 import { IScheduler } from "./scheduler";
 import { ParallelScheduler } from "./parallel";
-import { CreateDownloader } from "../downloader/factory";
+import { CreateDownloader } from "../downloader";
 import { ConsecutiveScheduler } from "./consecutive";
 
 export function CreateScheduler(session: Session, args: DownloadAction): IScheduler {

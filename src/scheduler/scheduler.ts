@@ -1,6 +1,6 @@
 import { DownloadTask } from "./download-task";
 import { Result } from "@usefultools/monads";
-import { IDownloader } from "../downloader/external";
+import { IDownloader } from "../downloader";
 import { DownloadAction } from "../commands/download-action";
 
 export interface IScheduler {

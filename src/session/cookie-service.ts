@@ -1,7 +1,6 @@
 import { Cookie, canonicalDomain, parseDate, CookieJar } from "tough-cookie";
 import * as fs from "fs";
-import { APIBaseURL } from "../Define";
-import { String as TSO } from "typescript-string-operations";
+import { APIBaseURL } from "../define";
 
 export class CookieService {
     public static Parse(cookieFile: string): Array<Cookie> {
@@ -42,6 +41,6 @@ export class CookieService {
     }
 
     public static BuildCookieHeader(cookies: Cookie[]): string {
-        return TSO.Join("; ", cookies.map(ck => `${ck.key}=${ck.value}`));
+        return cookies.map(ck => `${ck.key}=${ck.value}`).join("; ");
     }
 }

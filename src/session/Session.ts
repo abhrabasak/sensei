@@ -4,7 +4,7 @@ import { CookieService } from "./cookie-service";
 import { JsonConvert } from "json2typescript";
 import { Result, Ok, Err } from "@usefultools/monads";
 import { CookieJar } from "tough-cookie";
-import { APIBaseURL } from "../Define";
+import { APIBaseURL } from "../define";
 
 export class Session {
     client: AxiosInstance;

@@ -2,7 +2,6 @@ import { JsonProperty, JsonObject } from "json2typescript";
 import { ItemResponse } from "./item-response";
 import { SectionResponse } from "./section-response";
 import { ModuleResponse } from "./module-response";
-import { stringify } from "querystring";
 
 @JsonObject("CourseMaterialsElement")
 class CourseMaterialsElement {
