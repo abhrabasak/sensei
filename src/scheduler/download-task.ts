@@ -1,6 +1,6 @@
 import { Result } from "@usefultools/monads";
 
-type URLCallback = (result: Result<string, string>) => void;
+type URLCallback = (result: Result<string, Error>) => void;
 
 export class DownloadTask {
     URL: string

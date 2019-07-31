@@ -10,6 +10,8 @@ import { join } from "path";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { JsonConvert } from "json2typescript";
 import { format } from "util";
+import { CreateScheduler } from "../scheduler";
+import { Workflow } from "../coursera/workflow";
 
 export async function DownloadSpecialization(args: DownloadAction) {
     console.log(chalk.cyan(`Specialization: ${args.ClassNames.values}`));
@@ -66,8 +68,8 @@ async function DownloadOnDemandClass(session: Session, className: string, args: 
     if (args.CacheSyllabus.value) {
         const syllabusExists = existsSync(syllabusFile);
         if (syllabusExists) {
-            const syllabus = readFileSync(syllabusFile);
-            course = j.deserializeObject(syllabus, Course);
+            const syllabus: string = readFileSync(syllabusFile).toString();
+            course = JSON.parse(syllabus);
         }
     }
     // If no cached syllabus is found, generate the syllabus
@@ -81,13 +83,14 @@ async function DownloadOnDemandClass(session: Session, className: string, args: 
     }
     // Check if syllabus should be cached - if yes, save it
     if (args.CacheSyllabus.value) {
-        const jsyl = JSON.stringify(j.serializeObject(course), null, 2);
+        const jsyl = JSON.stringify(course, null, 2);
         writeFileSync(syllabusFile, jsyl);
     }
     if (args.OnlySyllabus.value) {
         return Ok(true);
     }
-    // const ts = CreateScheduler(session, args);
-    // const workflow = 
-    return Ok(true);
+    const ts = CreateScheduler(session, args);
+    const workflow = new Workflow(ts, args, className);
+    const completed = workflow.DownloadCourse(course);
+    return completed;
 }

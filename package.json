@@ -10,11 +10,11 @@
     "start": "ts-node src/app.ts",
     "js": "npm run build && node dist/app.js"
   },
-  "repository": "https://github.com/electron/electron-quick-start-typescript",
+  "repository": "https://github.com/Abhra1992/sensetron",
   "keywords": [
     "Coursera"
   ],
-  "author": "GitHub",
+  "author": "Abhra Basak",
   "license": "CC0-1.0",
   "devDependencies": {
     "@microsoft/ts-command-line": "^4.2.6",
@@ -25,6 +25,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
+    "@types/fs-extra": "^8.0.0",
     "@usefultools/monads": "^2.1.0",
     "axios": "^0.19.0",
     "axios-cookiejar-support": "^0.5.0",

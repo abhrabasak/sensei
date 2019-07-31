@@ -15,7 +15,7 @@ export abstract class Scheduler implements IScheduler {
     abstract Schedule(task: DownloadTask): void;
     abstract Complete(): void;
 
-    schedule(url: string, file: string): Result<string, string> {
+    schedule(url: string, file: string): Result<string, Error> {
         let result = this.downloader.Download(url, file, this.args.Resume.value);
         return result.map(_ => url);
     }

@@ -15,6 +15,8 @@ export class DownloadAction extends CommandLineAction {
     // Downloaders
     public Downloader: CommandLineChoiceParameter;
     public Resume: CommandLineFlagParameter;
+    public Overwrite: CommandLineFlagParameter;
+    public SkipDownload: CommandLineFlagParameter;
 
     public constructor() {
         super({
@@ -80,6 +82,14 @@ export class DownloadAction extends CommandLineAction {
         this.Resume = this.defineFlagParameter({
             parameterLongName: "--resume",
             description: "Enable download resume"
+        });
+        this.Overwrite = this.defineFlagParameter({
+            parameterLongName: "--overwrite",
+            description: "Enable overwrite"
+        });
+        this.SkipDownload = this.defineFlagParameter({
+            parameterLongName: "--skip-download",
+            description: "Enable skip download"
         });
     }
 

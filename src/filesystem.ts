@@ -1,9 +1,11 @@
 import { Ok, Result } from "@usefultools/monads";
-import { existsSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { parse } from "url";
+import { mkdirsSync } from "fs-extra";
 
-export function EnsureDirExists(dirName: string): Result<void, Error> {
-    return Ok(null);
+export function EnsureDirExists(dirName: string): Result<string, Error> {
+    mkdirsSync(dirName);
+    return Ok(dirName);
 }
 
 export function FileExists(fname: string): boolean {
@@ -30,4 +32,33 @@ export function CleanURL(link: string): string {
 
 export function NormalizeFilePath(path: string): string {
     return "";
+}
+
+const TrustedFormats = /^mp4$|^srt$|^docx?$|^pptx?$|^xlsx?$|^pdf$|^zip$/;
+const ComplexFormats = /.*[^a-zA-Z0-9_-]/;
+
+export function ShouldSkipFormatURL(format: string, link: string): boolean {
+    if (format == null || format == "") {
+        return true;
+    }
+    if (ComplexFormats.test(format)) {
+        return true;
+    }
+    // Skip emails
+    if (link.includes("mailto") || link.includes("@")) {
+        return true;
+    }
+    const parsed = parse(link);
+    // Skip Localhost
+    if (parsed.host == "localhost") {
+        return true;
+    }
+    // Skip site root
+    if (parsed.path == null || parsed.path == "" || parsed.path == "/") {
+        return true;
+    }
+    if (TrustedFormats.test(format)) {
+        return false;
+    }
+    return false;
 }

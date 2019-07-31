@@ -2,8 +2,10 @@ import { Session } from "../session/session";
 import { DownloadAction } from "../commands/download-action";
 import { MembershipsURL, MakeCourseraAbsoluteURL, LectureVideosURL, AssetURL, SupplementsURL } from "../define";
 import { Result, Ok, Err } from "@usefultools/monads";
-import { CourseResponse, CoContents, CoContentAsset, Anchor, MembershipsResponse, AnchorCollection, AssetsResponse } from "../views";
-import { ModuleResponse, CourseMaterialsResponse, SectionResponse, ItemResponse, Video, LectureVideosResponse } from "../views";
+import {
+    CourseResponse, CoContents, CoContentAsset, Anchor, MembershipsResponse, AnchorCollection, AssetsResponse,
+    ModuleResponse, CourseMaterialsResponse, SectionResponse, ItemResponse, Video, LectureVideosResponse
+} from "../views";
 import { Module, Section, Item, Course, Resource, ResourceGroup } from "../models";
 import chalk from "chalk";
 import { format } from "util";
@@ -19,6 +21,11 @@ export class OnDemand {
         this.session = session;
         this.args = args;
         this.classID = classID;
+    }
+
+    public async ObtainUserID(): Promise<Result<number, Error>> {
+        const result = await this.session.GetJson(MembershipsURL, MembershipsResponse);
+        return result.map(mr => mr.Elements[0].UserID);
     }
 
     public async ListCourses(): Promise<Result<CourseResponse[], Error>> {

@@ -12,6 +12,9 @@ export const SupplementsURL = APIBaseURL + "/onDemandSupplements.v1/%s~%s?includ
 export const AssetURL = APIBaseURL + "/assetUrls.v1?ids=%s";
 export const OpenCourseAssetsURL = APIBaseURL + "/openCourseAssets.v1/%s";
 
+export const InMemoryMarker = "#inmemory#"
+export const WindowsUNCPrefix = "\\\\?\\"
+
 export function MakeCourseraAbsoluteURL(link: string): string {
     const linkURL = parse(link);
     if (linkURL.host != null) {
