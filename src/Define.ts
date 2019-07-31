@@ -1,6 +1,6 @@
 import { parse } from "url";
 
-export const CookieFile = "C:/Coursera/cookies.txt";
+export const CookieFile = "cookies.txt";
 export const HostBaseURL = "https://api.coursera.org";
 export const APIBaseURL = "https://api.coursera.org/api";
 export const SpecializationURL = APIBaseURL + "/onDemandSpecializations.v1?q=slug&slug=%s&fields=courseIds&includes=courseIds";

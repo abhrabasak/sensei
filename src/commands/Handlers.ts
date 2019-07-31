@@ -15,7 +15,7 @@ import { Workflow } from "../coursera/workflow";
 
 export async function DownloadSpecialization(args: DownloadAction) {
     console.log(chalk.cyan(`Specialization: ${args.ClassNames.values}`));
-    const cookieFile = CookieFile;
+    const cookieFile = join(args.Path.value, CookieFile);
     let session = new Session(cookieFile);
     let result = await GetSpecialization(session, args.ClassNames.values[0]);
     return result.map(sp => {
@@ -42,7 +42,7 @@ async function GetSpecialization(session: Session, name: string): Promise<Result
 export function DownloadCourses(args: DownloadAction) {
     let courseNames = args.ClassNames.values;
     console.log(chalk.cyan(`Class Names: ${courseNames}`));
-    const cookieFile = CookieFile;
+    const cookieFile = join(args.Path.value, CookieFile);
     let session = new Session(cookieFile);
     for (const c of courseNames) {
         DownloadOnDemandClass(session, c, args);
@@ -50,7 +50,7 @@ export function DownloadCourses(args: DownloadAction) {
 }
 
 export async function ListCourses(args: DownloadAction) {
-    const cookieFile = CookieFile;
+    const cookieFile = join(args.Path.value, CookieFile);
     let session = new Session(cookieFile);
     let extractor = new Extractor(session, args);
     let result = await extractor.ListCourses();

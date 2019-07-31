@@ -94,7 +94,6 @@ export class DownloadAction extends CommandLineAction {
     }
 
     protected onExecute(): Promise<void> {
-        // let promise: Promise<void> = null;
         switch (this.ClassType.value) {
             case "spz":
                 DownloadSpecialization(this);
