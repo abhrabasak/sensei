@@ -1,13 +1,14 @@
 import { Session } from "../session/session";
 import { DownloadAction } from "../commands/download-action";
-import { CourseResponse } from "../views/course-response";
-import { MembershipsURL, MakeCourseraAbsoluteURL, LectureVideosURL } from "../define";
-import { MembershipsResponse } from "../views/membership-response";
+import { MembershipsURL, MakeCourseraAbsoluteURL, LectureVideosURL, AssetURL, SupplementsURL } from "../define";
 import { Result, Ok, Err } from "@usefultools/monads";
+import { CourseResponse, CoContents, CoContentAsset, Anchor, MembershipsResponse, AnchorCollection, AssetsResponse } from "../views";
 import { ModuleResponse, CourseMaterialsResponse, SectionResponse, ItemResponse, Video, LectureVideosResponse } from "../views";
 import { Module, Section, Item, Course, Resource, ResourceGroup } from "../models";
 import chalk from "chalk";
 import { format } from "util";
+import { basename, extname } from "path";
+import { CleanFileName, CleanURL } from "../filesystem";
 
 export class OnDemand {
     session: Session;
@@ -124,7 +125,24 @@ export class OnDemand {
     }
 
     private async extractLinksFromSupplement(elementID: string): Promise<Result<ResourceGroup, Error>> {
-        return Ok(new ResourceGroup());
+        const url = format(SupplementsURL, this.classID, elementID);
+        const result = await this.session.GetJson(url, AssetsResponse);
+        if (result.is_err()) {
+            return Err(result.unwrap_err());
+        }
+        const sr = result.unwrap();
+        const supContent = new ResourceGroup();
+        for (const asset of sr.Linked.Assets) {
+            const value = asset.Definition.Value;
+            const result = await this.extractLinksFromText(value);
+            if (result.is_err()) {
+                return Err(result.unwrap_err());
+            }
+            const resx = result.unwrap();
+            supContent.Extend(resx);
+        }
+        // Incomplete implementation - Not downloading Mathjax instructions
+        return Ok(supContent);
     }
 
     // #region Extract Lecture Video
@@ -175,6 +193,79 @@ export class OnDemand {
                 videoContent.set("srt", [...(videoContent.get("srt") || []), resource]);
             }
         }
+    }
+
+    // #endregion
+
+    // #region Extract Supplements
+
+    private async extractLinksFromText(text: string): Promise<Result<ResourceGroup, Error>> {
+        let resx = new ResourceGroup();
+        let page = CoContents.Parse(text);
+        const result = await this.extractLinksFromAssetTags(page);
+        return result.map(assets => {
+            resx.Extend(assets);
+            const anchors = this.extractLinksFromAnchorTags(page);
+            resx.Extend(anchors);
+            return resx;
+        })
+    }
+
+    private async extractLinksFromAssetTags(page: CoContents): Promise<Result<ResourceGroup, Error>> {
+        const assetTags = this.extractAssetTags(page);
+        const resx = new ResourceGroup();
+        if (assetTags.size == 0) {
+            return Ok(resx);
+        }
+        const result = await this.extractAssetURLs(assetTags);
+        return result.map(assets => {
+            if (assets == null) {
+                return resx;
+            }
+            for (const a of assets) {
+                const [title, ext, link] = [CleanFileName(assetTags.get(a.ID).Name), CleanFileName(assetTags.get(a.ID).Extension), a.Link];
+                resx.set(ext, [...(resx.get(ext) || []), { Name: title, Link: link, Extension: ext }]);
+            }
+            return resx;
+        })
+    }
+
+    private extractAssetTags(page: CoContents): Map<string, CoContentAsset> {
+        let assets = new Map<string, CoContentAsset>();
+        for (const a of page.Assets) {
+            assets.set(a.ID, a);
+        }
+        return assets;
+    }
+
+    private async extractAssetURLs(assetTags: Map<string, CoContentAsset>): Promise<Result<Anchor[], Error>> {
+        const assetIDs = [...assetTags.keys()];
+        const url = format(AssetURL, assetIDs.join(","));
+        const result = await this.session.GetJson(url, AnchorCollection);
+        return result.map(ar => {
+            if (ar == null) {
+                return null;
+            }
+            return ar.Elements;
+        });
+    }
+
+    private extractLinksFromAnchorTags(page: CoContents): ResourceGroup {
+        const resx = new ResourceGroup();
+        for (const a of page.Anchors) {
+            if (a.Link == null || a.Link == "") {
+                continue;
+            }
+            const fname = basename(CleanURL(a.Link));
+            let ext = extname(fname).toLowerCase();
+            if (ext == null || ext == "") {
+                continue;
+            }
+            const base = CleanFileName(fname.replace(ext, ""));
+            ext = CleanFileName(ext).replace(/^[ \.]+|[ \.]+$/g, "");
+            resx.set(ext, [...(resx.get(ext) || []), { Name: base, Link: a.Link, Extension: ext }]);
+        }
+        return resx;
     }
 
     // #endregion

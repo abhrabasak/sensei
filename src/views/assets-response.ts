@@ -27,13 +27,13 @@ class ItemAsset {
 @JsonObject("AssetsLinked")
 class AssetsLinked {
     @JsonProperty("openCourseAssets.v1", [ItemAsset])
-    Assets: ItemAsset[]
+    Assets: ItemAsset[] = undefined;
 }
 
-@JsonObject("LectureAssetsResponse")
-export class LectureAssetsResponse {
+@JsonObject("AssetsResponse")
+export class AssetsResponse {
     @JsonProperty("elements", [AssetElement])
-    Elements: AssetElement[]
+    Elements: AssetElement[] = undefined;
     @JsonProperty("linked", AssetsLinked)
     Linked: AssetsLinked = undefined;
 }

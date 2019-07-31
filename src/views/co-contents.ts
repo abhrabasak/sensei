@@ -1,4 +1,5 @@
 import { JsonProperty, JsonObject } from "json2typescript";
+import { Parse } from "xml-core";
 
 @JsonObject("Anchor")
 export class Anchor {
@@ -15,12 +16,38 @@ export class AnchorCollection {
 }
 
 export class CoContentAsset {
-    ID: string // asset,[id]
-    Name: string // asset,[name]
-    Extension: string // asset,[extension]
+    ID: string;
+    Name: string;
+    Extension: string;
 }
 
 export class CoContents {
-    Assets: CoContentAsset[] // co-content
-    Anchors: Anchor[] // co-content
+    Assets: CoContentAsset[];
+    Anchors: Anchor[];
+
+    public static Parse(doc: string): CoContents {
+        const tree = Parse(doc);
+        const assetElements = tree.getElementsByTagName("asset");
+        assetElements.item
+        let assets: CoContentAsset[] = null;
+        if (typeof (assetElements) !== typeof (undefined)) {
+            assets = Array.from(assetElements).map(a => <CoContentAsset>{
+                ID: a.getAttribute("id"),
+                Name: a.getAttribute("name"),
+                Extension: a.getAttribute("extension")
+            });
+        }
+        const anchorElements = tree.getElementsByTagName("a");
+        let anchors: Anchor[] = null;
+        if (typeof (anchorElements) !== typeof (undefined)) {
+            anchors = Array.from(anchorElements).map(a => <Anchor>{
+                ID: a.innerText,
+                Link: a.getAttribute("href")
+            });
+        }
+        return {
+            Assets: assets,
+            Anchors: anchors
+        };
+    }
 }

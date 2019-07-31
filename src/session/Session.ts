@@ -22,16 +22,13 @@ export class Session {
     }
 
     public async GetJson<T>(url: string, type: new () => T): Promise<Result<T, Error>> {
-        let response = this.client.get(url);
-        let result: Result<T, Error> = await response.then((ar) => {
-            if (ar.status == 200) {
-                let resJson: T = this.json.deserializeObject(ar.data, type);
-                return Ok(resJson);
-            } else {
-                return Err(new Error("Request Failed"));
-            }
-        });
-        return result;
+        let ar = await this.client.get(url);
+        if (ar.status == 200) {
+            let resJson: T = this.json.deserializeObject(ar.data, type);
+            return Ok(resJson);
+        } else {
+            return Err(new Error("Request Failed"));
+        }
     }
 
     public CookieHeader(): string {
