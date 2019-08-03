@@ -10,7 +10,7 @@
     "start": "ts-node src/app.ts",
     "js": "npm run build && node dist/app.js",
     "syllabus": "npm start -- download -t=spz -c=career-success -p=C:/Coursera --only-syllabus",
-    "download": "npm start -- download -t=spz -c=career-success -p=C:/Coursera --cache-syllabus"
+    "download": "npm start -- download -t=spz -c=hsk-learn-chinese -p=C:/Coursera --cache-syllabus"
   },
   "repository": "https://github.com/Abhra1992/sensetron",
   "keywords": [

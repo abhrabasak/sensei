@@ -208,7 +208,7 @@ export class OnDemand {
 
     private async extractLinksFromText(text: string): Promise<Result<ResourceGroup, Error>> {
         let resx = new ResourceGroup();
-        let page = CoContents.Parse(text);
+        let page = CoContents.From(text);
         const result = await this.extractLinksFromAssetTags(page);
         return result.map(assets => {
             resx.Extend(assets);

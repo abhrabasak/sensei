@@ -1,7 +1,7 @@
 import { DownloadAction } from "./download-action";
 import chalk from "chalk";
 import { Session } from "../session/session";
-import { SpecializationResponse } from "../views/specialization-response";
+import { SpecializationResponse } from "../views";
 import { SpecializationURL, CookieFile } from "../define";
 import { Specialization, Course } from "../models";
 import { Extractor } from "../coursera/extractor";
